@@ -28,6 +28,19 @@ class IA:
                             'saludo' : {
                                 'type' : 'string',
                                 'description' : 'Responder el saludo'
+                            },
+                        },
+                    },
+                },
+                {
+                    'name' : 'open_browser',
+                    'description' : 'Abrir el navegador de chrome en un sitio especifico',
+                    'parameters' : {
+                        'type' : 'object',
+                        'properties': {
+                            'number' : {
+                                'type' : 'string',
+                                'description' : 'El sitio al cual desea ir'
                             }
                         }
                     }

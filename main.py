@@ -4,6 +4,7 @@ from ia import IA
 from voice import Voice
 import json
 import os
+from subprocess import call
 
 recognizer = sr.Recognizer()
 voice = Voice()
@@ -12,8 +13,8 @@ os.environ['PATH'] += os.pathsep + 'C:\PATH_Programs'
 
 with sr.Microphone() as source:
 
-    audio = voice.generate_audio('Buenos días, habla al servicio de soporte de internet, ¿En que puedo ayudarle?')
-    voice.play(audio)
+    # audio = voice.generate_audio('Buenos días, habla al servicio de soporte de internet, ¿En que puedo ayudarle?')
+    # voice.play(audio)
 
     recognizer.adjust_for_ambient_noise(source)
     print('Escuchando...')
@@ -35,8 +36,8 @@ with sr.Microphone() as source:
         final_response = ia.process_response(text, message, function_name, function_response)
 
 
-        audio = voice.generate_audio(final_response)
-        voice.play(audio)
+        # audio = voice.generate_audio(final_response)
+        # voice.play(audio)
 
         print(f'El bot dijo: {final_response}')
 
