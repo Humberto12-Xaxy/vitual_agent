@@ -15,8 +15,22 @@ with sr.Microphone() as source:
     
     try:
         print('Reconociendo...')
-        text = openai.Audio.transcribe(model= 'whisper-1',file= audio)
-        print(f'Dijiste: {text["text"]}')
-    
+        text = recognizer.recognize_google(audio, language= 'es-ES')
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo-0613",
+            messages=[
+                    {"role": "system", "content": "Eres un asistente de tonalá chiapas"},
+                    {"role": "user", "content": text},
+            ]
+        )
+
+        print(f'Dijiste: {text}')
+
+        result = ''
+        for choices in response.choices:
+            result += choices.message.content
+        
+        print(f'El bot dijo: {result}')
     except Exception as e:
         print(f'Error: {e}')
