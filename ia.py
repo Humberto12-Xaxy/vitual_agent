@@ -15,19 +15,19 @@ class IA:
         response = openai.ChatCompletion.create(
             model = 'gpt-3.5-turbo-0613',
             messages = [
-                {'role': 'system', 'content': 'Eres un agente telefónIco de call center que trabaja para la empresa de IZZI'},
+                {'role': 'system', 'content': 'Eres un agente telefónico de call center que trabaja como soporte para la empresa de IZZI'},
                 {'role': 'system', 'content': text}, 
             ],
             functions = [
                 {
-                    'name' : 'get_saludo',
-                    'description' : 'Contestar un saludo',
+                    'name' : 'no_internet_service',
+                    'description' : 'Dar intrucciones para que pueda reestablecer el internet',
                     'parameters' : {
                         'type' : 'object',
                         'properties' : {
-                            'saludo' : {
+                            'instrucciones' : {
                                 'type' : 'string',
-                                'description' : 'Responder el saludo'
+                                'description' : 'Dar instrucciones para reestableces el servicio, recuerda que eres del servicio de soporte'
                             },
                         },
                     },
