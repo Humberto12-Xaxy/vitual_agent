@@ -20,14 +20,17 @@ class IA:
             ],
             functions = [
                 {
-                    'name' : 'no_internet_service',
-                    'description' : 'Dar intrucciones para que pueda reestablecer el internet',
+                    'name' : 'no_service',
+                    'description' : 'Dar intrucciones acerca del servicio afectado o repetir la informacion que anteriormente diste',
                     'parameters' : {
                         'type' : 'object',
                         'properties' : {
-                            'instrucciones' : {
-                                'type' : 'string',
-                                'description' : 'Dar instrucciones para reestableces el servicio, recuerda que eres del servicio de soporte'
+                            'opciones' : {
+                                'type' : 'object',
+                                'no_internet' : {
+                                    'type' : 'string',
+                                    'intrucciones' : 'Dar instrucciones que ayuden a resolver los problemas de internet, recuerda que eres de soporte tecnico'
+                                }
                             },
                         },
                     },
@@ -50,7 +53,7 @@ class IA:
         )
 
         message:dict = response['choices'][0]['message']
-        
+        print(response)
         if message.get('function_call'):
             function_name = message['function_call']['name']
             args = message['function_call']['arguments']

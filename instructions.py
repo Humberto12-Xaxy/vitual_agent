@@ -2,8 +2,11 @@
 class Instruction:
 
     def __init__(self) -> None:
-        self.file = open('instrucciones.txt', 'r', encoding= 'utf-8')
+        self.file = None
         
+
+    def set_file(self, path_intructions):
+        self.file = open(path_intructions, 'r', encoding= 'utf-8')
 
     def get_content_file(self):
         instruction = ''
@@ -13,8 +16,3 @@ class Instruction:
         
         return instruction
         
-
-if __name__ == '__main__':
-
-    instruccion = InstruInstructionccion()
-    instruccion.get_file()
