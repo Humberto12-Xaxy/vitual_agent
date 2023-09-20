@@ -5,7 +5,7 @@ modelo = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-2.7B")
 tokenizador = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B")
 
 # Texto de entrada
-texto_entrada = "Tengo problemas con mi conexión a internet. "
+texto_entrada = "No tengo a internet. "
 
 # Codificar el texto de entrada en tokens
 entrada_tokens = tokenizador.encode(texto_entrada, return_tensors="pt")

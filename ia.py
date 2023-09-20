@@ -20,30 +20,27 @@ class IA:
             ],
             functions = [
                 {
-                    'name' : 'no_service',
+                    'name' : 'no_internet_service',
                     'description' : 'Dar intrucciones acerca del servicio afectado o repetir la informacion que anteriormente diste',
                     'parameters' : {
                         'type' : 'object',
                         'properties' : {
-                            'opciones' : {
-                                'type' : 'object',
-                                'no_internet' : {
-                                    'type' : 'string',
-                                    'intrucciones' : 'Dar instrucciones que ayuden a resolver los problemas de internet, recuerda que eres de soporte tecnico'
-                                }
-                            },
+                            'instruciones' : {                               
+                                'type' : 'string',
+                                'description' : 'Dar instrucciones que ayuden a resolver los problemas de internet, recuerda que eres de soporte tecnico'
+                            }
                         },
                     },
                 },
                 {
-                    'name' : 'open_browser',
-                    'description' : 'Abrir el navegador de chrome en un sitio especifico',
+                    'name' : 'bye',
+                    'description' : 'Despedirce del cliente',
                     'parameters' : {
                         'type' : 'object',
                         'properties': {
-                            'number' : {
+                            'despedida' : {
                                 'type' : 'string',
-                                'description' : 'El sitio al cual desea ir'
+                                'description' : 'Despedirse del cliente cuando ya hayas dado la información que el requrió'
                             }
                         }
                     }
@@ -53,7 +50,7 @@ class IA:
         )
 
         message:dict = response['choices'][0]['message']
-        print(response)
+
         if message.get('function_call'):
             function_name = message['function_call']['name']
             args = message['function_call']['arguments']

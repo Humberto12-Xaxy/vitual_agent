@@ -33,9 +33,9 @@ while True:
             function_name, args, message = ia.process_funtions(text)
             
             if function_name is not None:
-                if function_name == 'no_service':
+                if function_name == 'no_internet_service':
                     instruction.set_file('instrucciones.txt')
-                # print(f'nombre de la funcion: {function_name} args: {args} menssage: {message}')
+                    
                     function_response = {'intrucciones': instruction.get_content_file(), 'mas_ayuda' : 'Le voy a comunicar con una persona de soporte tecnico para que puedan agendar una cita'}
                     function_response = json.dumps(function_response)
                     
