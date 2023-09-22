@@ -21,11 +21,11 @@ class IA:
             functions = [
                 {
                     'name' : 'no_internet_service',
-                    'description' : 'Dar intrucciones acerca del servicio afectado o repetir la informacion que anteriormente diste',
+                    'description' : 'Dar intrucciones para arreglar el problema de internet',
                     'parameters' : {
-                        'type' : 'object',
+                        'type': 'object',
                         'properties' : {
-                            'instruciones' : {                               
+                             'instruciones' : {                               
                                 'type' : 'string',
                                 'description' : 'Dar instrucciones que ayuden a resolver los problemas de internet, recuerda que eres de soporte tecnico'
                             }
@@ -62,18 +62,30 @@ class IA:
 
     def process_response(self, text, message, function_name, function_response):
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-0613",
-            messages = [
-                {'role' : 'system', 'content' : 'Eres un agente telefónIco de call center que trabaja para la empresa de IZZI'},
-                {'role' : 'user', 'content' : text},
-                message,
-                {
-                    'role' : 'function',
-                    'name' : function_name,
-                    'content' : function_response
-                },
-            ],
-        )
+        if function_name != '':
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0613",
+                messages = [
+                    {'role' : 'system', 'content' : 'Eres un agente telefónIco de call center que trabaja para la empresa de IZZI'},
+                    {'role' : 'user', 'content' : text},
+                    message,
+                    {
+                        'role' : 'function',
+                        'name' : function_name,
+                        'content' : function_response
+                    },
+                ],
+            )
 
-        return response['choices'][0]['message']['content']
+            return response['choices'][0]['message']['content']
+        
+        else:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0613",
+                messages = [
+                    {'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja para la empresa de IZZI'},
+                    {'role' : 'user', 'content' : text},
+                ],
+            )
+
+            return response['choices'][0]['message']['content']

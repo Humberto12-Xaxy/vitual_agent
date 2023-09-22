@@ -16,17 +16,20 @@ class VoiceAssistent:
 
     def __init__(self) -> None:  
         self.polly = boto3.client('polly', region_name= 'us-east-1', aws_access_key_id= 'AKIAZ3FMUPPGFUKTQRPG', aws_secret_access_key= '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')
+        
         self.function_name = None
         self.args = None
-        self.recognizer = sr.Recognizer()
+        self.message = ''
+        
         self.text = ''
         self.final_response = ''
+        
+        self.recognizer = sr.Recognizer()
+        self.microphone = sr.Microphone()
         self.ia = IA()
         self.instruction = Instruction()
+        
         self.active = True
-
-        self.speak_thread = threading.Thread(target= self.speak)
-        self.stop_event = threading.Event()
         self.is_speaking = False
 
         
@@ -37,7 +40,7 @@ class VoiceAssistent:
 
     def listen(self):
         while self.text.lower() != 'detener':
-            with sr.Microphone() as source:
+            with self.microphone as source:
                 print('Entre al with')
                 try:
                     self.recognizer.adjust_for_ambient_noise(source)
@@ -46,18 +49,14 @@ class VoiceAssistent:
                     
                     self.text = self.recognizer.recognize_google(audio, language= 'es-MX')
                     print(f'Dijiste: {self.text}')
+
+                    if self.text.lower() == 'detener':
+                        self.stop_audio()
                 except Exception as e:
                     print(f'Error: {e}')
         
         else:
             self.active = False
-    
-    def speak(self):
-        if self.final_response != '':
-            print('Estoy hablando')
-            self.is_speaking = True
-            self.synthesize_speech(self.final_response)
-            self.play_audio()
             
     def synthesize_speech(self, text):
 
@@ -83,28 +82,35 @@ class VoiceAssistent:
     
 
     def response_ia(self):
-        if self.function_name is not None:
+        print(f'function_name : {self.function_name}')
+        
+        if self.text != 'detener':
             if self.function_name == 'no_internet_service':
                 self.instruction.set_file('instrucciones.txt')
 
                 function_response = {'intrucciones': self.instruction.get_content_file(), 'mas_ayuda' : 'Le voy a comunicar con una persona de soporte tecnico para que puedan agendar una cita'}
                 function_response = json.dumps(function_response)
 
-                print('Respondiendo...')
                 self.final_response = self.ia.process_response(self.text, self.message, self.function_name, function_response)
 
-        else: 
-            function_response = 'Esta funcion no está programada en el sistema'
+                print('Respondiendo...')
+                self.synthesize_speech(self.final_response)
+                self.play_audio()
+            
+            else:
+                function_response = {'ayudar en lo que necesite': 'Dar instrucciones de lo que el cliente pida correspondiendo a algun problema de IZZI'}
+                function_response = json.dumps(function_response)
 
-            print('Respondiendo...')
-            self.synthesize_speech(function_response)
-            self.play_audio()
+                self.final_response = self.ia.process_response(self.text, self.message, '', function_response)
+                print('Respondiendo...')
+                self.synthesize_speech(self.final_response)
+                self.play_audio()
 
-            print(f'El bot dijo: {function_response}')
 
     def play_audio(self):
         
-        pygame.init()
+        self.is_speaking = True
+        pygame.init()   
         sound = pygame.mixer.Sound(self.output)
 
         sound.play()
@@ -113,28 +119,24 @@ class VoiceAssistent:
             pass
 
         pygame.quit()
+        self.is_speaking = False
 
     def stop_audio(self):
+        pygame.mixer.stop()
         self.is_speaking = False
-        self.stop_event.set()
 
 if __name__ == '__main__':
 
     voice_assistent = VoiceAssistent()
 
     voice_assistent.listen_start()
-    voice_assistent.speak_thread.start()
 
     while voice_assistent.active:
-        
-        if voice_assistent.is_speaking and voice_assistent.text:
-            voice_assistent.stop_audio()
 
         if voice_assistent.text != '':
             voice_assistent.resquest_ia()
             voice_assistent.response_ia()
             voice_assistent.text = ''
     
-    voice_assistent.speak_thread.join()
     voice_assistent.listen_thread.join()
         
