@@ -2,6 +2,7 @@ from contextlib import closing
 import json
 import os
 import threading
+import time
 
 import speech_recognition as sr
 
@@ -50,7 +51,7 @@ class VoiceAssistent:
                     self.text = self.recognizer.recognize_google(audio, language= 'es-MX')
                     print(f'Dijiste: {self.text}')
 
-                    if self.text.lower() == 'detener':
+                    if self.text.lower() == 'detener' and self.is_speaking:
                         self.stop_audio()
                 except Exception as e:
                     print(f'Error: {e}')
@@ -86,12 +87,30 @@ class VoiceAssistent:
         
         if self.text != 'detener':
             if self.function_name == 'no_internet_service':
-                self.instruction.set_file('instrucciones.txt')
+                
+                # conversation = []
+                # conversation.append({'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja para la empresa de IZZI, pregunta acerca de su problema o si requiere información'})
+                
+                # while True:
+                #     conversation.append({"role": "user", "content": self.text})
+                    
+                #     self.final_response = self.ia.conversarion(conversation)
 
-                function_response = {'intrucciones': self.instruction.get_content_file(), 'mas_ayuda' : 'Le voy a comunicar con una persona de soporte tecnico para que puedan agendar una cita'}
+                #     self.synthesize_speech(self.final_response)
+                #     self.play_audio()
+
+                #     conversation.append({"role": "system", "content": self.final_response})
+
+                function_response = {'intrucciones': self.instruction.no_internet_service()}
                 function_response = json.dumps(function_response)
 
+                start_time = time.time()
                 self.final_response = self.ia.process_response(self.text, self.message, self.function_name, function_response)
+                end_time = time.time()
+
+                tiempo_transcurrido = end_time - start_time
+
+                print(f'Tiempo de ejecucion de la funcion: {tiempo_transcurrido}')
 
                 print('Respondiendo...')
                 self.synthesize_speech(self.final_response)
@@ -128,6 +147,11 @@ class VoiceAssistent:
 if __name__ == '__main__':
 
     voice_assistent = VoiceAssistent()
+
+    saludo = voice_assistent.ia.call_intro()
+
+    voice_assistent.synthesize_speech(saludo)
+    voice_assistent.play_audio()
 
     voice_assistent.listen_start()
 

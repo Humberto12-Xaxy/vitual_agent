@@ -15,7 +15,7 @@ class IA:
         response = openai.ChatCompletion.create(
             model = 'gpt-3.5-turbo-0613',
             messages = [
-                {'role': 'system', 'content': 'Eres un agente telefónico de call center que trabaja como soporte para la empresa de IZZI'},
+                {'role': 'system', 'content': 'Eres un agente telefónico de call center que trabaja como soporte para la empresa de IZZI, No puedes contar chistes ya que no eres un payaso'},
                 {'role': 'system', 'content': text}, 
             ],
             functions = [
@@ -66,7 +66,7 @@ class IA:
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0613",
                 messages = [
-                    {'role' : 'system', 'content' : 'Eres un agente telefónIco de call center que trabaja para la empresa de IZZI'},
+                    {'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja como soporte para la empresa de IZZI, No puedes contar chistes ya que no eres un payaso'},
                     {'role' : 'user', 'content' : text},
                     message,
                     {
@@ -89,3 +89,33 @@ class IA:
             )
 
             return response['choices'][0]['message']['content']
+        
+    def call_intro(self):
+
+        instruction = 'Comienza la llamada con un saludo no digas al principio "agente telefonico", di que eres un bot'
+
+        response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0613",
+                messages = [
+                    {'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja para la empresa de IZZI'},
+                    {'role' : 'user', 'content' : instruction},
+                ],
+            )
+        return response['choices'][0]['message']['content']
+    
+
+    def conversarion(self, conversation:list):
+
+        response =  openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-0613",
+                messages = conversation
+            )
+        
+        return response['choices'][0]['message']['content']
+
+
+if __name__ == '__main__':
+
+    ia = IA()
+
+    print(ia.call_intro())
