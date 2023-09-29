@@ -12,6 +12,17 @@ class IA:
         openai.api_key = os.getenv('API_KEY')
         self.instruction = Instruction()
         self.no_internet_service = json.dumps({'instruction' : self.instruction.no_internet_service()})
+        context = {
+            'ID' : '12345678',
+            'Nombre' : 'Humberto Suriano Medina',
+            'estado de cuenta' : 'Activo',
+        }
+        self.interaction = [
+                {
+                    'role' : 'system', 
+                    'content' : f'Actúa como un agente telefónico de call Center de Izzi, analiza la matriz: {context} y brindarme una solución si hay datos necesarios pero antes de dar los datos pregunta el numero de cuenta o el nombre completo para validar que es el dueño de la cuenta, solo dame información si tiene que ver con un problema de Izzi, si pregunta cosas como dame un chiste pide que sea serio, si te doy un número de cuenta búscalo en la matriz'
+                }
+            ]
 
     
     def process_funtions(self, text):
@@ -126,16 +137,16 @@ class IA:
         return response['choices'][0]['message']['content']
     
 
-    def conversation(self, user_context, context):
+    def conversation(self, user_context):
+
+        self.interaction.append({'role' : 'user', 'content' : user_context})
 
         response =  openai.ChatCompletion.create(
                 model="gpt-4",
-                messages = [
-                    {'role' : 'system', 'content' : f'Actúa como un agente telefónico de call Center de Izzi, analiza la matriz: {context} y brindarme una solución si hay datos necesarios, solo dame información si tiene que ver con un problema de Izzi, si pregunta cosas como dame un chiste pide que sea serio, si te doy un número de cuenta búscalo en la matriz'},
-                    {'role' : 'user', 'content' : user_context},
-                ],
+                messages = self.interaction
             )
         
+        self.interaction.append({'role' : 'assistant', 'content' : response['choices'][0]['message']['content']})
         return response['choices'][0]['message']['content']
 
 

@@ -11,7 +11,6 @@ import boto3
 import pygame
 
 from ia import IA
-from categories.no_internet import no_internet_service
 
 class VoiceAssistent:
 
@@ -91,7 +90,7 @@ class VoiceAssistent:
         print(self.function_name)
     
         if self.function_name == 'no_internet_service':
-            
+            pass
             # conversation = []
             # conversation.append({'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja para la empresa de IZZI, pregunta acerca de su problema o si requiere información'})
             
@@ -104,7 +103,7 @@ class VoiceAssistent:
             #     self.play_audio()
 
             #     conversation.append({"role": "system", "content": self.final_response})
-            no_internet_service(self.synthesize_speech, self.play_audio)
+            # no_internet_service(self.synthesize_speech, self.play_audio)
 
             # start_time = time.time()
             # self.final_response = self.ia.process_response(self.text, self.message, self.function_name)
@@ -148,13 +147,8 @@ class VoiceAssistent:
 
     def response_ia(self):
 
-        context = {
-            'ID' : '12345678',
-            'Nombre' : 'Humberto Suriano Medina',
-            'estado de cuenta' : 'Activo',
-        }
 
-        response = self.ia.conversation(self.text, context)
+        response = self.ia.conversation(self.text)
 
         self.synthesize_speech(response)
         self.play_audio()
