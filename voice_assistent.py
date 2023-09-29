@@ -12,10 +12,14 @@ import pygame
 
 from ia import IA
 
+import os
+from dotenv import load_dotenv
+
 class VoiceAssistent:
 
     def __init__(self) -> None:  
-        self.polly = boto3.client('polly', region_name= 'us-east-1', aws_access_key_id= 'AKIAZ3FMUPPGFUKTQRPG', aws_secret_access_key= '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')
+        load_dotenv()
+        self.polly = boto3.client('polly', region_name= 'us-east-1', aws_access_key_id = os.getenv('AWS_KEY_ID'), aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY'))
         
         self.function_name = None
         self.args = None
