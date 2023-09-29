@@ -11,7 +11,7 @@ import boto3
 import pygame
 
 from ia import IA
-from instructions import Instruction
+from categories.no_internet import no_internet_service
 
 class VoiceAssistent:
 
@@ -51,11 +51,12 @@ class VoiceAssistent:
                     self.text = self.recognizer.recognize_google(audio, language= 'es-MX')
                     print(f'Dijiste: {self.text}')
 
-                    self.resquest_ia()
-                    if self.function_name == 'stop' and self.is_speaking:
+                    if self.text == 'espera' and self.is_speaking:
                         self.stop_audio()
-                except Exception as e:
-                    print(f'Error: {e}')
+                except sr.UnknownValueError:
+                    print('No se pudo entender el audio')
+                except sr.RequestError as e:
+                    print(f'Error en la solicitud: {e}')
         
         else:
             self.active = False
@@ -80,68 +81,83 @@ class VoiceAssistent:
     def resquest_ia(self):
         
         if self.text != '':
-            self.function_name, self.args, self.message = self.ia.process_funtions(self.text)
-    
+            try:
+                self.function_name, self.args, self.message = self.ia.process_funtions(self.text)
+            except Exception as e:
+                print(e)
 
     def response_ia(self):
         
-        if self.text != 'detener':
-            if self.function_name == 'no_internet_service':
-                
-                # conversation = []
-                # conversation.append({'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja para la empresa de IZZI, pregunta acerca de su problema o si requiere información'})
-                
-                # while True:
-                #     conversation.append({"role": "user", "content": self.text})
-                    
-                #     self.final_response = self.ia.conversarion(conversation)
-
-                #     self.synthesize_speech(self.final_response)
-                #     self.play_audio()
-
-                #     conversation.append({"role": "system", "content": self.final_response})
-
-
-                # start_time = time.time()
-                self.final_response = self.ia.process_response(self.text, self.message, self.function_name)
-                # end_time = time.time()
-
-                # tiempo_transcurrido = end_time - start_time
-
-                # print(f'Tiempo de ejecucion de la funcion: {tiempo_transcurrido}')
-
-                print('Respondiendo...')
-                self.synthesize_speech(self.final_response)
-                self.play_audio()
+        print(self.function_name)
+    
+        if self.function_name == 'no_internet_service':
             
-            elif self.function_name == 'farewell':
+            # conversation = []
+            # conversation.append({'role' : 'system', 'content' : 'Eres un agente telefónico de call center que trabaja para la empresa de IZZI, pregunta acerca de su problema o si requiere información'})
+            
+            # while True:
+            #     conversation.append({"role": "user", "content": self.text})
                 
-                self.active = False
-                
-                function_response = {'despedida': 'Estoy para servirte, hasta luego'}
-                function_response = json.dumps(function_response)
+            #     self.final_response = self.ia.conversarion(conversation)
 
-                start_time = time.time()
-                self.final_response = self.ia.process_response(self.text, self.message, self.function_name, function_response)
-                end_time = time.time()
+            #     self.synthesize_speech(self.final_response)
+            #     self.play_audio()
 
-                tiempo_transcurrido = end_time - start_time
+            #     conversation.append({"role": "system", "content": self.final_response})
+            no_internet_service(self.synthesize_speech, self.play_audio)
 
-                print(f'Tiempo de ejecucion de la funcion: {tiempo_transcurrido}')
+            # start_time = time.time()
+            # self.final_response = self.ia.process_response(self.text, self.message, self.function_name)
+            # end_time = time.time()
 
-                print('Respondiendo...')
-                self.synthesize_speech(self.final_response)
-                self.play_audio()
+            # tiempo_transcurrido = end_time - start_time
 
-            else:
-                function_response = {'ayudar en lo que necesite': 'Dar instrucciones de lo que el cliente pida correspondiendo a algun problema de IZZI'}
-                function_response = json.dumps(function_response)
+            # print(f'Tiempo de ejecucion de la funcion: {tiempo_transcurrido}')
 
-                self.final_response = self.ia.process_response(self.text, self.message, '', function_response)
-                print('Respondiendo...')
-                self.synthesize_speech(self.final_response)
-                self.play_audio()
+            # print('Respondiendo...')
+            # self.synthesize_speech(self.final_response)
+            # self.play_audio()
+        
+        elif self.function_name == 'farewell':
+            
+            self.active = False
+            
+            function_response = {'despedida': 'Estoy para servirte, hasta luego'}
+            function_response = json.dumps(function_response)
 
+            start_time = time.time()
+            self.final_response = self.ia.process_response(self.text, self.message, self.function_name, function_response)
+            end_time = time.time()
+
+            tiempo_transcurrido = end_time - start_time
+
+            print(f'Tiempo de ejecucion de la funcion: {tiempo_transcurrido}')
+
+            print('Respondiendo...')
+            self.synthesize_speech(self.final_response)
+            self.play_audio()
+
+        else:
+            function_response = {'ayudar en lo que necesite': 'Dar instrucciones de lo que el cliente pida correspondiendo a algun problema de IZZI'}
+            function_response = json.dumps(function_response)
+
+            self.final_response = self.ia.process_response(self.text, self.message, '', function_response)
+            print('Respondiendo...')
+            self.synthesize_speech(self.final_response)
+            self.play_audio()
+
+    def response_ia(self):
+
+        context = {
+            'ID' : '12345678',
+            'Nombre' : 'Humberto Suriano Medina',
+            'estado de cuenta' : 'Activo',
+        }
+
+        response = self.ia.conversation(self.text, context)
+
+        self.synthesize_speech(response)
+        self.play_audio()
 
     def play_audio(self):
         
@@ -160,6 +176,7 @@ class VoiceAssistent:
     def stop_audio(self):
         pygame.mixer.stop()
         self.is_speaking = False
+        
 
 if __name__ == '__main__':
 
@@ -167,15 +184,17 @@ if __name__ == '__main__':
 
     saludo = voice_assistent.ia.call_intro()
 
+    voice_assistent.listen_start()
+
     voice_assistent.synthesize_speech(saludo)
     voice_assistent.play_audio()
 
-    voice_assistent.listen_start()
 
     while voice_assistent.active:
 
         if voice_assistent.text != '':
-            voice_assistent.resquest_ia()
+            # voice_assistent.resquest_ia()
+            # voice_assistent.response_ia()
             voice_assistent.response_ia()
             voice_assistent.text = ''
     

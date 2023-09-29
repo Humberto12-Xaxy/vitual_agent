@@ -51,7 +51,7 @@ class IA:
                 },
                 {
                     'name' : 'stop',
-                    'description' : 'Disculpa, necesito hacer una interripción',
+                    'description' : 'Revisar que lo que el usuario diga sea una interrupción',
                     'parameters' : {
                         'type' : 'object',
                         'properties' : {
@@ -114,7 +114,7 @@ class IA:
 
     def call_intro(self):
 
-        instruction = 'Comienza la llamada con un saludo no digas al principio "agente telefonico", di que eres un bot'
+        instruction = 'Comienza la llamada con un saludo no digas al principio "agente telefonico", di que eres un bot y te llamas Andrés'
 
         response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo-0613",
@@ -126,11 +126,14 @@ class IA:
         return response['choices'][0]['message']['content']
     
 
-    def conversarion(self, conversation:list):
+    def conversation(self, user_context, context):
 
         response =  openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0613",
-                messages = conversation
+                model="gpt-4",
+                messages = [
+                    {'role' : 'system', 'content' : f'Actúa como un agente telefónico de call Center de Izzi, analiza la matriz: {context} y brindarme una solución si hay datos necesarios, solo dame información si tiene que ver con un problema de Izzi, si pregunta cosas como dame un chiste pide que sea serio, si te doy un número de cuenta búscalo en la matriz'},
+                    {'role' : 'user', 'content' : user_context},
+                ],
             )
         
         return response['choices'][0]['message']['content']
@@ -138,6 +141,15 @@ class IA:
 
 if __name__ == '__main__':
 
+    context = {
+        'ID' : '12345678',
+        'Nombre' : 'Humberto Suriano Medina',
+        'estado de cuenta' : 'Activo',
+    }
+    user_context = ''
     ia = IA()
 
-    print(ia.call_intro())
+    while user_context != 'salir':
+        user_context = input()
+        print(ia.conversation(user_context, context))
+    

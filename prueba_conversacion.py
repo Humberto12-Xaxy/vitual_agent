@@ -6,27 +6,21 @@ from dotenv import load_dotenv
 load_dotenv()        
 openai.api_key = os.getenv('API_KEY')
 
-# Conversacion inicial
+def obtener_respuesta(mensaje):
+   respuesta = openai.Completion.create(
+       engine="text-davinci-002",
+       prompt=f"Bot: {mensaje}\nUsuario:",
+       temperature=0.7,
+   )
+   return respuesta.choices[0].text.strip()
+
+# Inicia la conversación
 conversacion = []
 
 while True:
-    # Obtiene la entrada del usuario
-    usuario_input = input("Tú: ")
+   entrada_usuario = input("Usuario: ")
+   conversacion.append(f"Usuario: {entrada_usuario}")
 
-    # Agrega la entrada del usuario a la conversación
-    conversacion.append({"role": "user", "content": usuario_input})
-
-    # Envía la conversación actual al modelo de OpenAI
-    respuesta = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=conversacion
-    )
-
-    # Obtiene la respuesta del modelo
-    respuesta_modelo = respuesta["choices"][0]["message"]["content"]
-
-    # Imprime la respuesta del modelo
-    print("Modelo:", respuesta_modelo)
-
-    # Agrega la respuesta del modelo a la conversación
-    conversacion.append({"role": "assistant", "content": respuesta_modelo})
+   respuesta_bot = obtener_respuesta("\n".join(conversacion))
+   conversacion.append(f"Bot: {respuesta_bot}")
+   print(f"Bot: {respuesta_bot}")
