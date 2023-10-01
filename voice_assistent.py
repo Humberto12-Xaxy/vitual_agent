@@ -154,6 +154,7 @@ class VoiceAssistent:
 
         response = self.ia.conversation(self.text)
 
+        return response
         self.synthesize_speech(response)
         self.play_audio()
 

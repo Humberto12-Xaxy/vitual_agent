@@ -1,26 +1,55 @@
 import flet
 from flet import (
     Page,
-    UserControl,
     Image
 )
 
-
-class TodoApp(UserControl):
-    def build(self):
-        return Image(src= './image/bot_escucha.gif', width= 300, height=300)
-        
+from voice_assistent import VoiceAssistent
 
 def main(page: Page):
+    
+    voice_assistent = VoiceAssistent()
+
     page.title = "ToDo App"
     page.horizontal_alignment = "center"
+    page.vertical_alignment = 'center'
     page.update()
 
-    # create application instance
-    app = TodoApp()
+    saludo = voice_assistent.ia.call_intro()
 
+    voice_assistent.listen_start()
+
+
+
+
+    image = Image(src= './image/bot_speaking.gif', width= 300, height= 300)
     # add application's root control to the page
-    page.add(app)
+    
+    page.add(
+        image
+    )
+
+    voice_assistent.synthesize_speech(saludo)
+    voice_assistent.play_audio()
+
+    while voice_assistent.active:
+        if voice_assistent.text != '':
+
+            response = voice_assistent.response_ia()
+            
+            if not voice_assistent.is_speaking:
+                image.src = './image/bot_speaking.gif'
+                page.update()
+                voice_assistent.synthesize_speech(response)
+                voice_assistent.play_audio()
+
+            voice_assistent.text = ''
+        else:
+            image.src = './image/bot_escucha.gif'
+            page.update()
+
+
+    voice_assistent.listen_thread.join()
 
 
 flet.app(target=main)
