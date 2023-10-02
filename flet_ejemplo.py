@@ -10,7 +10,7 @@ def main(page: Page):
     
     voice_assistent = VoiceAssistent()
 
-    page.title = "ToDo App"
+    page.title = "Bot"
     page.horizontal_alignment = "center"
     page.vertical_alignment = 'center'
     page.update()

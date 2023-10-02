@@ -1,3 +1,4 @@
+import time
 import speech_recognition as sr
 from ia import IA
 from instructions import Instruction
@@ -30,8 +31,12 @@ while True:
 
             
             print('Analizando...')
+            start_time = time.time()
             function_name, args, message = ia.process_funtions(text)
-            
+            end_time = time.time()
+            tiempo_transcurrido = end_time - start_time
+            print(f'Tiempo de ejecucion de la funcion: {tiempo_transcurrido}')
+
             if function_name is not None:
                 if function_name == 'no_internet_service':
                     instruction.set_file('instrucciones.txt')
@@ -41,7 +46,7 @@ while True:
                     
                     print('Respondiendo...')
                     final_response = ia.process_response(text, message, function_name, function_response)
-
+                    
                     voice_polly.synthesize_speech(final_response)
                     voice_polly.play_audio()
 
