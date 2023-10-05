@@ -44,8 +44,9 @@ class VoiceAssistent:
     def listen(self):
         phrases = ['espera', 'espera un momento', 'disculpa', 
                    'disculpa la interrupcion', 'permiteme un momento', 
-                   'dame un momento', 'permitame un momento', 
+                   'dame un momento', 'permitame un momento', 'no me interesa', 
                 ]
+        
         while self.active:
             with self.microphone as source:
                     self.recognizer.adjust_for_ambient_noise(source)
