@@ -21,12 +21,7 @@ class VoiceAssistent:
         load_dotenv()
         self.polly = boto3.client('polly', region_name= 'us-east-1', aws_access_key_id = os.getenv('AWS_KEY_ID'), aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY'))
         
-        self.function_name = None
-        self.args = None
-        self.message = ''
-        
         self.text = ''
-        self.final_response = ''
         
         self.recognizer = sr.Recognizer()
         self.microphone = sr.Microphone()
@@ -42,9 +37,10 @@ class VoiceAssistent:
         self.listen_thread.start()
 
     def listen(self):
-        phrases = ['espera', 'espera un momento', 'disculpa', 
-                   'disculpa la interrupcion', 'permiteme un momento', 
-                   'dame un momento', 'permitame un momento', 'no me interesa', 
+        phrases = [
+                'espera', 'espera un momento', 'disculpa', 
+                'disculpa la interrupcion', 'permiteme un momento', 
+                'dame un momento', 'permitame un momento', 'no me interesa', 
                 ]
         
         while self.active:
@@ -59,8 +55,20 @@ class VoiceAssistent:
                     self.text = self.recognizer.recognize_google(audio, language= 'es-MX')
                     print(f'Dijiste: {self.text}')
 
+
+                    if self.is_speaking and self.text:
+                        self.stop_audio()
+
+                        self.synthesize_speech('Estoy escuchando sus peticiones, pero permitame un momento por favor')
+                        self.play_audio()
+
+                        self.resume_audio()
+
                     if self.text in phrases and self.is_speaking:
                         self.stop_audio()
+                    
+                    if self.text == 'reanuda' and not self.is_speaking:
+                        self.resume_audio()
                 except sr.UnknownValueError:
                     print('No se pudo entender el audio')
                 except sr.RequestError as e:
@@ -84,15 +92,6 @@ class VoiceAssistent:
 
                 with open(self.output, 'wb') as file:
                     file.write(stream.read())
-    
-
-    def resquest_ia(self):
-        
-        if self.text != '':
-            try:
-                self.function_name, self.args, self.message = self.ia.process_funtions(self.text)
-            except Exception as e:
-                print(e)
 
     def response_ia(self):
 
@@ -110,14 +109,16 @@ class VoiceAssistent:
 
         while pygame.mixer.get_busy():
             pass
-
         pygame.quit()
         self.is_speaking = False
 
     def stop_audio(self):
         self.is_speaking = False
-        pygame.mixer.stop()
-        
+        pygame.mixer.pause()
+    
+    def resume_audio(self):
+        self.is_speaking = True
+        pygame.mixer.unpause()
 
 if __name__ == '__main__':
 
@@ -134,8 +135,7 @@ if __name__ == '__main__':
     while voice_assistent.active:
 
         if voice_assistent.text != '':
-            # voice_assistent.resquest_ia()
-            # voice_assistent.response_ia()
+
             voice_assistent.response_ia()
             voice_assistent.text = ''
     
