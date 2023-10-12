@@ -58,19 +58,19 @@ class VoiceAssistent:
                     print(f'Dijiste: {self.text}')
 
 
-                    if self.is_speaking and self.text:
-                        self.stop_audio()
+                    # if self.is_speaking and self.text:
+                    #     self.stop_audio()
 
-                        self.synthesize_speech('Estoy escuchando sus peticiones, pero permitame un momento por favor')
-                        self.play_audio()
+                    #     self.synthesize_speech('Estoy escuchando sus peticiones, pero permitame un momento por favor')
+                    #     self.play_audio()
 
-                        self.resume_audio()
+                    #     self.resume_audio()
 
                     if self.text in phrases and self.is_speaking:
                         self.stop_audio()
                     
-                    if self.text == 'reanuda' and not self.is_speaking:
-                        self.resume_audio()
+                    # if self.text == 'reanuda' and not self.is_speaking:
+                    #     self.resume_audio()
                 except sr.UnknownValueError:
                     print('No se pudo entender el audio')
                 except sr.RequestError as e:
@@ -87,10 +87,10 @@ class VoiceAssistent:
             text = text,
             model= 'eleven_multilingual_v2',
             voice= Voice(
-                voice_id= '3qgBRQoNma81GU0oOMdB',
-                settings= VoiceSettings(stability=.7, similarity_boost=0.2, style=0.01, use_speaker_boost=False)
+                voice_id= 'Ou8RTQTpWI3OiSkrgKeE',
+                # settings= VoiceSettings(stability=.7, similarity_boost=0.2, style=0.01, use_speaker_boost=False)
             ),
-            stream= True
+            stream= True,
         )
 
         with closing(audio) as stream:
