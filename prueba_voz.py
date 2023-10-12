@@ -1,41 +1,50 @@
-import requests
+from contextlib import closing
+import io
+from tempfile import gettempdir
+from elevenlabs import voices, generate, play, set_api_key, Voice, VoiceSettings
+from dotenv import load_dotenv
+import os
+import elevenlabs
 import pygame
 
 pygame.init()
-url = "https://app.coqui.ai/api/v2/samples/xtts/stream"
 
-payload = {
-    "speed": 1,
-    "language": "es",
-    "voice_id": "714c825b-0009-4819-aad5-02adbdb42e69",
-    "text": "Hola, como estás"
-}
-headers = {
-    "accept": "audio/wav",
-    "content-type": "application/json",
-    "authorization": "Bearer tgPuyY8f5k9hmiUFPoPcqjcdQ7fBUk2ELmKOY8aF3A6mW5g3lYZv0jtxZpyB33PA"
-}
+load_dotenv()
+# 3qgBRQoNma81GU0oOMdB
+set_api_key(os.getenv('ELEVENLABS_API_KEY'))
 
-response = requests.post(url, json=payload, headers=headers)
+audio = generate(
+    text = 'Que onda veguetta, vamos por las cariñosas',
+    model= 'eleven_multilingual_v2',
+    voice= Voice(
+        voice_id= '3qgBRQoNma81GU0oOMdB',
+        settings= VoiceSettings(stability=.7, similarity_boost=0.2, style=0.01, use_speaker_boost=False)
+    ),
+    stream= True
+)
 
-if response.status_code == 201:
+with closing(audio) as stream:
+    output = os.path.join(gettempdir(), 'speech.mp3')
+    print(stream)
 
-    pygame.event.get()
+    # Convert the generator object to a byte stream
+    byte_stream = io.BytesIO()
 
-    # audio = bytes(response.content)
+    # Wrap the generator object in another generator object that reads the data in chunks
+    # and writes it to the byte stream.
+    for chunk in stream:
+        byte_stream.write(chunk)
 
-    sound = pygame.mixer.Sound('./output.wav')
-    
-    sound.play()
+    with open(output, 'wb') as file:
+        # Write the byte stream to the file
+        file.write(byte_stream.getvalue())
 
-    while pygame.mixer.get_busy():
-        pass
-    
-    pygame.quit()
-    # Abre un archivo en modo binario para escribir los datos de audio
-    # with open("output.wav", "wb") as audio_file:
-    #     audio_file.write(response.content)
-    # print("Archivo de audio descargado exitosamente como 'output.wav'")
-else:
-    print("Error en la solicitud. Código de respuesta:", response.status_code)
+sound = pygame.mixer.Sound(output)
 
+sound.play()
+
+while pygame.mixer.get_busy():
+    pass
+# play(audio)
+
+# elevenlabs.stop()

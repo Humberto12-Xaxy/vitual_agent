@@ -1,8 +1,10 @@
 from contextlib import closing
+import io
 import json
 import os
 import threading
 import time
+from elevenlabs import generate, set_api_key, Voice, VoiceSettings
 
 import speech_recognition as sr
 
@@ -79,19 +81,47 @@ class VoiceAssistent:
             
     def synthesize_speech(self, text):
 
-        response = self.polly.synthesize_speech(
-                                    Engine="neural",
-                                    Text = text, 
-                                    LanguageCode="es-MX",
-                                    OutputFormat="mp3",
-                                    VoiceId="Andres")
-    
-        if 'AudioStream' in response:
-            with closing(response["AudioStream"]) as stream:
-                self.output = os.path.join(gettempdir(), 'speech.mp3')
+        set_api_key(os.getenv('ELEVENLABS_API_KEY'))
 
-                with open(self.output, 'wb') as file:
-                    file.write(stream.read())
+        audio = generate(
+            text = text,
+            model= 'eleven_multilingual_v2',
+            voice= Voice(
+                voice_id= '3qgBRQoNma81GU0oOMdB',
+                settings= VoiceSettings(stability=.7, similarity_boost=0.2, style=0.01, use_speaker_boost=False)
+            ),
+            stream= True
+        )
+
+        with closing(audio) as stream:
+            self.output = os.path.join(gettempdir(), 'speech.mp3')
+
+            # Convert the generator object to a byte stream
+            byte_stream = io.BytesIO()
+
+            # Wrap the generator object in another generator object that reads the data in chunks
+            # and writes it to the byte stream.
+            for chunk in stream:
+                byte_stream.write(chunk)
+
+            with open(self.output, 'wb') as file:
+                # Write the byte stream to the file
+                file.write(byte_stream.getvalue())
+
+        # response = self.polly.synthesize_speech(
+        #                             Engine="neural",
+        #                             Text = text, 
+        #                             LanguageCode="es-MX",
+        #                             OutputFormat="mp3",
+        #                             VoiceId="Andres")
+
+        # print(response['AudioStream'])
+        # if 'AudioStream' in response:
+        #     with closing(response["AudioStream"]) as stream:
+        #         self.output = os.path.join(gettempdir(), 'speech.mp3')
+
+        #         with open(self.output, 'wb') as file:
+        #             file.write(stream.read())
 
     def response_ia(self):
 
