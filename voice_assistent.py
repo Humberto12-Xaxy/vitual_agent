@@ -68,9 +68,12 @@ class VoiceAssistent:
 
                     if self.text in phrases and self.is_speaking:
                         self.stop_audio()
-                    
-                    # if self.text == 'reanuda' and not self.is_speaking:
-                    #     self.resume_audio()
+                        self.is_speaking = False
+
+                    if self.text == 'reanuda' and not self.is_speaking:
+                        self.resume_audio()
+                        self.is_speaking = True
+                        
                 except sr.UnknownValueError:
                     print('No se pudo entender el audio')
                 except sr.RequestError as e:

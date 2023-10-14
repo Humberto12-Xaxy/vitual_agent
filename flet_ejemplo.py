@@ -19,9 +19,6 @@ def main(page: Page):
 
     voice_assistent.listen_start()
 
-
-
-
     image = Image(src= './image/bot_speaking.gif', width= 300, height= 300)
     # add application's root control to the page
     
@@ -43,7 +40,12 @@ def main(page: Page):
                 voice_assistent.synthesize_speech(response)
                 voice_assistent.play_audio()
 
+            
+            image.src = './image/bot_escucha.gif'
+            page.update()
+            
             voice_assistent.text = ''
+
         else:
             image.src = './image/bot_escucha.gif'
             page.update()
