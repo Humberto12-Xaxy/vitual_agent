@@ -18,6 +18,7 @@ def main(page: Page):
     saludo = voice_assistent.ia.call_intro()
 
     voice_assistent.listen_start()
+    voice_assistent.speak_when_silence_start()
 
     image = Image(src= './image/bot_speaking.gif', width= 300, height= 300)
     # add application's root control to the page
@@ -35,6 +36,7 @@ def main(page: Page):
             response = voice_assistent.response_ia()
             
             if not voice_assistent.is_speaking:
+                voice_assistent.response = ''
                 image.src = './image/bot_speaking.gif'
                 page.update()
                 voice_assistent.synthesize_speech(response)
@@ -52,6 +54,6 @@ def main(page: Page):
 
 
     voice_assistent.listen_thread.join()
-
+    voice_assistent.speak_when_silence_thread.join()
 
 flet.app(target=main)
