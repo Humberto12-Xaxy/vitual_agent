@@ -177,7 +177,7 @@ if __name__ == '__main__':
     voice_assistent.listen_start()
 
     voice_assistent.synthesize_speech(saludo)
-    voice_assistent.play_audio()
+    voice_assistent.play_audio()    
 
 
     while voice_assistent.active:
